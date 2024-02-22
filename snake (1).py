@@ -3,6 +3,8 @@ import os
 import pygame as pg
 from random import randrange
 pg.font.init()
+pg.mixer.init()
+
 #Задаем параметры
 window = 500
 tile_size = 25
@@ -29,12 +31,17 @@ snake_head_image = pg.transform.scale(snake_image, (tile_size - 2, tile_size - 2
 
 food_image = pg.image.load('resources/box.png')
 food_head_image = pg.transform.scale(food_image, (tile_size - 2, tile_size - 2))
-speed = 5
+speed = 3
 scoreRecord = 0
+# lofiSound = pg.mixer.Sound('resources/lofi.mp3')
+# pg.mixer.Sound.play(lofiSound) 
+pg.mixer.music.load ('resources/lofi.mp3')
+pg.mixer.music.play(-1)
 
 #Тело игры и запуск
 while True:
   clock.tick(speed)
+
   for event in pg.event.get():
       if event.type == pg.QUIT:
           exit()
@@ -68,8 +75,12 @@ while True:
       snake.center, food.center = get_random_position(), get_random_position()
       length, segments = 1, [snake.copy()]
       snake_dir = (0, 0)
-      gameOverStr =  "Game over!" + "Score record: " + str(scoreRecord)
+      gameOverStr =  "Game over! " + "Score record: " + str(scoreRecord)
       text = font.render(gameOverStr, True, (255, 255, 255))
+      gameOverSound = pg.mixer.Sound('resources/gameover.wav')
+      pg.mixer.Sound.play(gameOverSound)
+
+  
   #показываем текст
   text_rect = text.get_rect(center=(410, 480))
   screen.blit(text, text_rect)
@@ -82,6 +93,8 @@ while True:
       if length > scoreRecord:
         scoreRecord = length-1
       speed +=1
+      PickSound = pg.mixer.Sound('resources/pick.mp3')
+      pg.mixer.Sound.play(PickSound)
       
       showText = "Your score is: " + str (length-1)
       text = font.render(showText, True, (255, 255, 255))
