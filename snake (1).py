@@ -1,4 +1,5 @@
 #Импортируем необходимые библиотеки
+import os
 import pygame as pg
 from random import randrange
 pg.font.init()
@@ -19,23 +20,26 @@ snake.center = get_random_position()
 screen = pg.display.set_mode([window] * 2)
 clock = pg.time.Clock()
 dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 1, pg.K_d: 1}
-
+#text
 font = pg.font.Font(None, 18)
 text = font.render("Your score is: 0", True, (255, 255, 255))
-
+#pictures
 snake_image = pg.image.load('resources/truck.png')
 snake_head_image = pg.transform.scale(snake_image, (tile_size - 2, tile_size - 2))
 
 food_image = pg.image.load('resources/box.png')
 food_head_image = pg.transform.scale(food_image, (tile_size - 2, tile_size - 2))
-
+speed = 5
+scoreRecord = 0
 
 #Тело игры и запуск
 while True:
+  clock.tick(speed)
   for event in pg.event.get():
       if event.type == pg.QUIT:
           exit()
       if event.type == pg.KEYDOWN:
+          
           if event.key == pg.K_w and dirs[pg.K_w]:
               snake_dir = (0, -tile_size)
               dirs = {pg.K_w: 1, pg.K_s: 0, pg.K_a: 1, pg.K_d: 1}
@@ -64,8 +68,10 @@ while True:
       snake.center, food.center = get_random_position(), get_random_position()
       length, segments = 1, [snake.copy()]
       snake_dir = (0, 0)
+      gameOverStr =  "Game over!" + "Score record: " + str(scoreRecord)
+      text = font.render(gameOverStr, True, (255, 255, 255))
   #показываем текст
-  text_rect = text.get_rect(center=(450, 480))
+  text_rect = text.get_rect(center=(410, 480))
   screen.blit(text, text_rect)
   
   
@@ -73,7 +79,11 @@ while True:
   if snake.colliderect(food):
       food.center = get_random_position()
       length += 1
-      showText = "Your score is: " + str (length)
+      if length > scoreRecord:
+        scoreRecord = length-1
+      speed +=1
+      
+      showText = "Your score is: " + str (length-1)
       text = font.render(showText, True, (255, 255, 255))
       pg.display.flip()
   #Рисуем еду
