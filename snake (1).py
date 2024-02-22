@@ -11,7 +11,7 @@ snake = pg.Rect([0, 0, tile_size - 2, tile_size - 2])
 length = 1
 segments = [snake.copy()]
 snake_dir = (0, 0)
-time, time_step = 0, 110
+time, time_step = 0, 250
 food = snake.copy()
 food.center = get_random_position()
 snake.center = get_random_position()
@@ -19,10 +19,10 @@ screen = pg.display.set_mode([window] * 2)
 clock = pg.time.Clock()
 dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 1, pg.K_d: 1}
 
-snake_image = pg.image.load('images/ship.bmp')
+snake_image = pg.image.load('4108680.png')
 snake_head_image = pg.transform.scale(snake_image, (tile_size - 2, tile_size - 2))
 
-food_image = pg.image.load('images/alien.bmp')
+food_image = pg.image.load('1104134.png')
 food_head_image = pg.transform.scale(food_image, (tile_size - 2, tile_size - 2))
 
 #Тело игры и запуск
@@ -61,7 +61,9 @@ while True:
     #Рисуем еду
     screen.blit(food_head_image, food)
     #Рисуем змейку
-    [screen.blit(snake_head_image, snake) for snake in segments]
+    screen.blit(snake_head_image, snake)
+    for segment in segments[:-1]:
+      screen.blit(food_head_image, segment)
     #Двигаем змейку
     time_now = pg.time.get_ticks()
     if time_now - time > time_step:
