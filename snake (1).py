@@ -2,7 +2,7 @@
 import pygame as pg
 from random import randrange
 
-#Задаем параметры
+#Задаем параметрыыыы
 window = 500
 tile_size = 25
 range = (tile_size // 2, window - tile_size // 2, tile_size)
