@@ -67,8 +67,9 @@ while True:
   #Рисуем еду
   screen.blit(food_head_image, food)
   #Рисуем змейку
-  for segment in segments:
-      screen.blit(snake_head_image, segment)
+  screen.blit(snake_head_image, snake)
+  for segment in segments[:-1]:
+      screen.blit(food_head_image, segment)
   #Двигаем змейку
   time_now = pg.time.get_ticks()
   if time_now - time > time_step:
