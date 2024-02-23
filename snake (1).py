@@ -1,13 +1,18 @@
 #Импортируем необходимые библиотеки
+import os
+from typing import Self
 import pygame as pg
 from random import randrange
+pg.font.init()
+pg.mixer.init()
 
 #Задаем параметры
 window = 500
 tile_size = 25
 range = (tile_size // 2, window - tile_size // 2, tile_size)
+
 get_random_position = lambda: [randrange(*range), randrange(*range)]
-snake = pg.Rect([0, 0, tile_size - 2, tile_size - 2])
+snake = pg.Rect(0, 0, tile_size - 2, tile_size - 2)
 length = 1
 segments = [snake.copy()]
 snake_dir = (0, 0)
@@ -18,32 +23,114 @@ snake.center = get_random_position()
 screen = pg.display.set_mode([window] * 2)
 clock = pg.time.Clock()
 dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 1, pg.K_d: 1}
+dev
+#text
+font = pg.font.Font(None, 18)
+text = font.render("Your score is: 0", True, (255, 255, 255))
+#pictures
+snake_image = pg.image.load('resources/truck.png')
+snake_head_image = pg.transform.scale(snake_image, (tile_size - 2, tile_size - 2))
+
+food_image = pg.image.load('resources/box.png')
+
 
 snake_image = pg.image.load('4108680.png')
 snake_head_image = pg.transform.scale(snake_image, (tile_size - 2, tile_size - 2))
 
 food_image = pg.image.load('1104134.png')
+main
 food_head_image = pg.transform.scale(food_image, (tile_size - 2, tile_size - 2))
+speed = 3
+scoreRecord = 0
+
+pg.mixer.music.load ('resources/lofi.mp3')
+pg.mixer.music.play(-1) 
+
+background_image = pg.image.load('resources/background.jpg')
+background_image = pg.transform.scale(background_image, (window, window))
 
 #Тело игры и запуск
 while True:
+  clock.tick(speed)
+  
+
   for event in pg.event.get():
-    if event.type == pg.QUIT:
-      exit()
-    if event.type == pg.KEYDOWN:
-      if event.key == pg.K_w and dirs[pg.K_w]:
-        snake_dir = (0, -tile_size)
-        dirs = {pg.K_w: 1, pg.K_s: 0, pg.K_a: 1, pg.K_d: 1}
-      if event.key == pg.K_s and dirs[pg.K_s]:
-        snake_dir = (0, tile_size)
-        dirs = {pg.K_w: 0, pg.K_s: 1, pg.K_a: 1, pg.K_d: 1}
-      if event.key == pg.K_a and dirs[pg.K_a]:
-        snake_dir = (-tile_size, 0)
-        dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 1, pg.K_d: 0}
-      if event.key == pg.K_d and dirs[pg.K_d]:
-        snake_dir = (tile_size, 0)
-        dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 0, pg.K_d: 1}
-    screen.fill('black')
+      if event.type == pg.QUIT:
+          exit()
+      if event.type == pg.KEYDOWN:
+          
+          if event.key == pg.K_w and dirs[pg.K_w]:
+              snake_dir = (0, -tile_size)
+              dirs = {pg.K_w: 1, pg.K_s: 0, pg.K_a: 1, pg.K_d: 1}
+          if event.key == pg.K_s and dirs[pg.K_s]:
+              snake_dir = (0, tile_size)
+              dirs = {pg.K_w: 0, pg.K_s: 1, pg.K_a: 1, pg.K_d: 1}
+          if event.key == pg.K_a and dirs[pg.K_a]:
+              snake_dir = (-tile_size, 0)
+              dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 1, pg.K_d: 0}
+          if event.key == pg.K_d and dirs[pg.K_d]:
+              snake_dir = (tile_size, 0)
+              dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 0, pg.K_d: 1}
+  screen.fill((0, 0, 0))
+  screen.blit(background_image, (0, 0)) 
+  #Проверка столкновений
+  food_in_tail = any(food.colliderect(segment) for segment in segments[:-1])
+  if food_in_tail:
+      food.center = get_random_position()
+  self_eating = snake.collidelist(segments[:-1]) != -1
+  if (
+      snake.left < 0
+      or snake.right > window
+      or snake.top < 0
+      or snake.bottom > window
+      or self_eating
+  ):
+      snake.center, food.center = get_random_position(), get_random_position()
+      length, segments = 1, [snake.copy()]
+      snake_dir = (0, 0)
+      gameOverStr =  "Game over! " + "Score record: " + str(scoreRecord)
+      text = font.render(gameOverStr, True, (255, 255, 255))
+      gameOverSound = pg.mixer.Sound('resources/gameover.wav')
+      pg.mixer.Sound.play(gameOverSound)
+
+  
+  #показываем текст
+  text_rect = text.get_rect(center=(410, 480))
+  screen.blit(text, text_rect)
+  
+  
+  #Проверка взаимодействия змейки с едой
+  if snake.colliderect(food):
+      food.center = get_random_position()
+      length += 1
+      if length > scoreRecord:
+        scoreRecord = length-1
+      speed +=1
+      PickSound = pg.mixer.Sound('resources/pick.mp3')
+      pg.mixer.Sound.play(PickSound)
+      
+      showText = "Your score is: " + str (length-1)
+      text = font.render(showText, True, (255, 255, 255))
+      pg.display.flip()
+  #Рисуем еду
+  screen.blit(food_head_image, food)
+  #Рисуем змейку
+  screen.blit(snake_head_image, snake)
+  for segment in segments[:-1]:
+      screen.blit(food_head_image, segment)
+  #Двигаем змейку
+  time_now = pg.time.get_ticks()
+  if time_now - time > time_step:
+      time = time_now
+      snake.move_ip(snake_dir)
+      segments.append(snake.copy())
+      segments = segments[-length:]
+  pg.display.flip()
+  clock.tick(10)
+ 
+
+dev
+  
 
     #Проверка столкновений
     food_in_tail = pg.Rect.collidelist(food, segments[:-1]) != -1
@@ -71,6 +158,5 @@ while True:
         snake.move_ip(snake_dir)
         segments.append(snake.copy())
         segments = segments[-length:]
+main
 
-    pg.display.flip()
-    clock.tick(60)
