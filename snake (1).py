@@ -16,13 +16,14 @@ snake = pg.Rect(0, 0, tile_size - 2, tile_size - 2)
 length = 1
 segments = [snake.copy()]
 snake_dir = (0, 0)
-time, time_step = 0, 110
+time, time_step = 0, 250
 food = snake.copy()
 food.center = get_random_position()
 snake.center = get_random_position()
 screen = pg.display.set_mode([window] * 2)
 clock = pg.time.Clock()
 dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 1, pg.K_d: 1}
+dev
 #text
 font = pg.font.Font(None, 18)
 text = font.render("Your score is: 0", True, (255, 255, 255))
@@ -31,6 +32,13 @@ snake_image = pg.image.load('resources/truck.png')
 snake_head_image = pg.transform.scale(snake_image, (tile_size - 2, tile_size - 2))
 
 food_image = pg.image.load('resources/box.png')
+
+
+snake_image = pg.image.load('4108680.png')
+snake_head_image = pg.transform.scale(snake_image, (tile_size - 2, tile_size - 2))
+
+food_image = pg.image.load('1104134.png')
+main
 food_head_image = pg.transform.scale(food_image, (tile_size - 2, tile_size - 2))
 speed = 3
 scoreRecord = 0
@@ -121,5 +129,34 @@ while True:
   clock.tick(10)
  
 
+dev
   
+
+    #Проверка столкновений
+    food_in_tail = pg.Rect.collidelist(food, segments[:-1]) != -1
+    if food_in_tail:
+        food.center = get_random_position()
+    self_eating = pg.Rect.collidelist(snake, segments[:-1]) != -1
+    if snake.left < 0 or snake.right > window or snake.top < 0 or snake.bottom > window or self_eating:
+        snake.center, food.center = get_random_position(), get_random_position()
+        length, segments = 1, [snake.copy()]
+        snake_dir = (0, 0)
+    #Проверка взаимодействия змейки с едой
+    if snake.center == food.center:
+        food.center = get_random_position()
+        length += 1
+    #Рисуем еду
+    screen.blit(food_head_image, food)
+    #Рисуем змейку
+    screen.blit(snake_head_image, snake)
+    for segment in segments[:-1]:
+      screen.blit(food_head_image, segment)
+    #Двигаем змейку
+    time_now = pg.time.get_ticks()
+    if time_now - time > time_step:
+        time = time_now
+        snake.move_ip(snake_dir)
+        segments.append(snake.copy())
+        segments = segments[-length:]
+main
 
