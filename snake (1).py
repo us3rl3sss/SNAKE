@@ -1,5 +1,6 @@
 #Импортируем необходимые библиотеки
 import os
+from typing import Self
 import pygame as pg
 from random import randrange
 pg.font.init()
@@ -33,14 +34,17 @@ food_image = pg.image.load('resources/box.png')
 food_head_image = pg.transform.scale(food_image, (tile_size - 2, tile_size - 2))
 speed = 3
 scoreRecord = 0
-# lofiSound = pg.mixer.Sound('resources/lofi.mp3')
-# pg.mixer.Sound.play(lofiSound) 
+
 pg.mixer.music.load ('resources/lofi.mp3')
-pg.mixer.music.play(-1)
+pg.mixer.music.play(-1) 
+
+background_image = pg.image.load('resources/background.jpg')
+background_image = pg.transform.scale(background_image, (window, window))
 
 #Тело игры и запуск
 while True:
   clock.tick(speed)
+  
 
   for event in pg.event.get():
       if event.type == pg.QUIT:
@@ -59,7 +63,8 @@ while True:
           if event.key == pg.K_d and dirs[pg.K_d]:
               snake_dir = (tile_size, 0)
               dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 0, pg.K_d: 1}
-  screen.fill((0, 0, 0)) 
+  screen.fill((0, 0, 0))
+  screen.blit(background_image, (0, 0)) 
   #Проверка столкновений
   food_in_tail = any(food.colliderect(segment) for segment in segments[:-1])
   if food_in_tail:
