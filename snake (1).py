@@ -24,7 +24,7 @@ snake.center = get_random_position()
 screen = pg.display.set_mode([window] * 2)
 clock = pg.time.Clock()
 dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 1, pg.K_d: 1}
-speed = 6
+speed = 8
 scoreRecord = 0
 
 #Вывод счета
@@ -88,7 +88,7 @@ while True:
       text = font.render(gameOverStr, True, (255, 255, 255))
       gameOverSound = pg.mixer.Sound('resources/gameover.wav')
       pg.mixer.Sound.play(gameOverSound)
-      speed = 6
+      speed = 8
       time_step = 250
 
   #Вывод текста счета:
@@ -102,7 +102,7 @@ while True:
       if length > scoreRecord:
         scoreRecord = length-1
       speed += 1
-      time_step -= 5
+      time_step -= 10
       PickSound = pg.mixer.Sound('resources/pick.mp3')
       pg.mixer.Sound.play(PickSound)
       
