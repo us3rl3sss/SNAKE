@@ -8,8 +8,8 @@ pg.font.init()
 pg.mixer.init()
 
 #Задаем параметры
-window = 500
-tile_size = 50
+window = 525
+tile_size = 35
 range = (tile_size // 2, window - tile_size // 2, tile_size)
 
 get_random_position = lambda: [randrange(*range), randrange(*range)]
@@ -17,7 +17,7 @@ snake = pg.Rect(0, 0, tile_size - 2, tile_size - 2)
 length = 1
 segments = [snake.copy()]
 snake_dir = (0, 0)
-time, time_step = 0, 250
+time, time_step = 0, 300
 food = snake.copy()
 food.center = get_random_position()
 snake.center = get_random_position()
@@ -57,8 +57,8 @@ def GameOver ():
       text = font.render(gameOverStr, True, (255, 255, 255))
       gameOverSound = pg.mixer.Sound('resources/gameover.wav')
       pg.mixer.Sound.play(gameOverSound)
-      speed = 8
-      time_step = 250
+      speed = 5
+      time_step = 300
 
 def EatFood():
         global food, length, scoreRecord, speed, time_step, showText, text
@@ -66,9 +66,10 @@ def EatFood():
         length += 1
         if length > scoreRecord:
             scoreRecord = length-1
-        if speed<22:
-            speed += 1
-        time_step -= 10
+        if speed<1000:
+            speed += 50
+        if (time_step>=160):
+            time_step -= 7
         PickSound = pg.mixer.Sound('resources/pick.mp3')
         pg.mixer.Sound.play(PickSound)
       
@@ -82,10 +83,9 @@ def MoveSnake():
     segments.append(snake.copy())
     segments = segments[-length:]
 
-#Тело игры и запуск (Данный цикл проверяет нажатия кнопок, есть словарь (массив данных с ключем и значением), проверяем направления змейки, которая не должна входить в саму себя)
-while True:
-  clock.tick(speed)
-  for event in pg.event.get():
+def Controls ():
+    global snake_dir, dirs
+    for event in pg.event.get():
       if event.type == pg.QUIT:
           exit()
       if event.type == pg.KEYDOWN: 
@@ -101,6 +101,20 @@ while True:
           if event.key == pg.K_d and dirs[pg.K_d]:
               snake_dir = (tile_size, 0)
               dirs = {pg.K_w: 1, pg.K_s: 1, pg.K_a: 0, pg.K_d: 1}
+def DrawUI ():
+  global screen, food, snake, segment
+    #Рисуем еду
+  screen.blit(food_head_image, food)
+  #Рисуем змейку
+  screen.blit(snake_head_image, snake)
+  for segment in segments[:-1]:
+      screen.blit(food_head_image, segment)
+
+
+#Тело игры и запуск (Данный цикл проверяет нажатия кнопок, есть словарь (массив данных с ключем и значением), проверяем направления змейки, которая не должна входить в саму себя)
+while True:
+  clock.tick(speed)
+  Controls()
   #Создание фона
   Background ()
   #Проверка столкновений
@@ -127,15 +141,11 @@ while True:
   if snake.colliderect(food):
       EatFood()
   
-  #Рисуем еду
-  screen.blit(food_head_image, food)
-  #Рисуем змейку
-  screen.blit(snake_head_image, snake)
-  for segment in segments[:-1]:
-      screen.blit(food_head_image, segment)
+  #Рисуем еду и змейку
+  DrawUI()
+
   #Двигаем змейку (каждый тик змейка изменяет свое значение.Меняем значение, когда время превышает определенное кол-во тиков)
   time_now = pg.time.get_ticks()
   if time_now - time > time_step:
       MoveSnake()
   pg.display.flip()
-  clock.tick(60)
